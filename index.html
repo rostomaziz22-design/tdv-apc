@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TDV APC - Simulateur</title>
+
+<!-- QR library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #0f172a, #1e1b4b);
+    color: white;
+}
+
+/* HEADER */
+header {
+    text-align: center;
+    padding: 20px;
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(10px);
+    border-bottom: 2px solid #38bdf8;
+}
+
+header h1 {
+    margin: 0;
+    color: #38bdf8;
+}
+
+header p {
+    margin: 5px;
+    opacity: 0.8;
+}
+
+/* CONTAINER */
+.container {
+    max-width: 900px;
+    margin: auto;
+    padding: 20px;
+}
+
+/* CARD */
+.card {
+    background: rgba(255,255,255,0.06);
+    backdrop-filter: blur(12px);
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+/* TABLE */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    overflow: hidden;
+    border-radius: 10px;
+}
+
+th {
+    background: #38bdf8;
+    color: black;
+    padding: 12px;
+}
+
+td {
+    text-align: center;
+    padding: 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+/* CHECKBOX */
+input[type="checkbox"] {
+    transform: scale(1.4);
+    cursor: pointer;
+}
+
+/* BUTTON */
+button {
+    margin-top: 15px;
+    padding: 12px 18px;
+    border: none;
+    background: #22c55e;
+    color: white;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    background: #16a34a;
+    transform: scale(1.05);
+}
+
+/* RESULT */
+#result {
+    margin-top: 15px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+/* QR */
+.qr {
+    margin-top: 25px;
+    text-align: center;
+    padding: 15px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>🧠 Simulateur Table de Vérité</h1>
+    <p>Formateur APC - Aziz Mohamed Rostom</p>
+</header>
+
+<div class="container">
+
+<div class="card">
+
+<h2>Exercice : ET / OU logique</h2>
+
+<table>
+<tr>
+<th>A</th>
+<th>B</th>
+<th>ET</th>
+<th>OU</th>
+</tr>
+
+<tr>
+<td>0</td>
+<td>0</td>
+<td><input type="checkbox" id="et1"></td>
+<td><input type="checkbox" id="ou1"></td>
+</tr>
+
+<tr>
+<td>0</td>
+<td>1</td>
+<td><input type="checkbox" id="et2"></td>
+<td><input type="checkbox" id="ou2"></td>
+</tr>
+
+<tr>
+<td>1</td>
+<td>0</td>
+<td><input type="checkbox" id="et3"></td>
+<td><input type="checkbox" id="ou3"></td>
+</tr>
+
+<tr>
+<td>1</td>
+<td>1</td>
+<td><input type="checkbox" id="et4"></td>
+<td><input type="checkbox" id="ou4"></td>
+</tr>
+</table>
+
+<button onclick="corriger()">✔ Voir résultat</button>
+
+<div id="result"></div>
+
+<div class="qr">
+    <h3>📱 Scanner pour ouvrir sur mobile</h3>
+    <div id="qrcode"></div>
+</div>
+
+</div>
+
+</div>
+
+<script>
+// CORRECTION TDV
+function corriger() {
+
+    let score = 0;
+    let total = 8;
+
+    let correct = {
+        et1:false, et2:false, et3:false, et4:true,
+        ou1:false, ou2:true, ou3:true, ou4:true
+    };
+
+    for(let id in correct){
+        if(document.getElementById(id).checked === correct[id]){
+            score++;
+        }
+    }
+
+    let percent = Math.round((score/total)*100);
+
+    let level = "";
+
+    if(percent < 50) level = "🔴 Insuffisant";
+    else if(percent < 75) level = "🟡 Moyen";
+    else if(percent < 90) level = "🟢 Bon";
+    else level = "🏆 Excellent";
+
+    document.getElementById("result").innerHTML =
+        `Score : ${percent}% (${score}/8) <br>${level}`;
+}
+
+
+// QR CODE DYNAMIQUE (IMPORTANT POUR GITHUB PAGES)
+let currentURL = window.location.href;
+
+new QRCode(document.getElementById("qrcode"), {
+    text: currentURL,
+    width: 160,
+    height: 160,
+    colorDark: "#38bdf8",
+    colorLight: "#ffffff"
+});
+
+</script>
+
+</body>
+</html>
