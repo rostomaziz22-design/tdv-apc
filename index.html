@@ -101,6 +101,10 @@ button:hover {
     margin-top: 15px;
     font-size: 18px;
     font-weight: bold;
+    text-align: center;
+    padding: 15px;
+    background: rgba(34,197,94,0.1);
+    border-radius: 10px;
 }
 
 /* QR */
@@ -110,6 +114,30 @@ button:hover {
     padding: 15px;
     background: rgba(255,255,255,0.05);
     border-radius: 10px;
+}
+
+/* INFO LINK */
+.link-info {
+    margin-top: 10px;
+    font-size: 12px;
+    opacity: 0.7;
+    word-break: break-all;
+}
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+    th, td {
+        padding: 8px;
+        font-size: 14px;
+    }
+    
+    button {
+        width: 100%;
+    }
+    
+    .container {
+        padding: 10px;
+    }
 }
 </style>
 </head>
@@ -125,52 +153,53 @@ button:hover {
 
 <div class="card">
 
-<h2>Exercice : ET / OU logique</h2>
+<h2>📋 Exercice : ET / OU logique</h2>
+
+<p>✅ Coche les cases selon la table de vérité :</p>
 
 <table>
-<tr>
+<thead>
 <th>A</th>
 <th>B</th>
-<th>ET</th>
-<th>OU</th>
-</tr>
-
+<th>ET (A ∧ B)</th>
+<th>OU (A ∨ B)</th>
+</thead>
+<tbody>
 <tr>
 <td>0</td>
 <td>0</td>
 <td><input type="checkbox" id="et1"></td>
 <td><input type="checkbox" id="ou1"></td>
 </tr>
-
 <tr>
 <td>0</td>
 <td>1</td>
 <td><input type="checkbox" id="et2"></td>
 <td><input type="checkbox" id="ou2"></td>
 </tr>
-
 <tr>
 <td>1</td>
 <td>0</td>
 <td><input type="checkbox" id="et3"></td>
 <td><input type="checkbox" id="ou3"></td>
 </tr>
-
 <tr>
 <td>1</td>
 <td>1</td>
 <td><input type="checkbox" id="et4"></td>
 <td><input type="checkbox" id="ou4"></td>
 </tr>
+</tbody>
 </table>
 
-<button onclick="corriger()">✔ Voir résultat</button>
+<button onclick="corriger()">✔ Vérifier mes réponses</button>
 
 <div id="result"></div>
 
 <div class="qr">
     <h3>📱 Scanner pour ouvrir sur mobile</h3>
     <div id="qrcode"></div>
+    <div class="link-info" id="linkDisplay"></div>
 </div>
 
 </div>
@@ -178,15 +207,21 @@ button:hover {
 </div>
 
 <script>
-// CORRECTION TDV
+// CORRECTION TABLE DE VÉRITÉ
 function corriger() {
 
     let score = 0;
     let total = 8;
 
     let correct = {
-        et1:false, et2:false, et3:false, et4:true,
-        ou1:false, ou2:true, ou3:true, ou4:true
+        et1: false,   // 0 ET 0 = 0
+        et2: false,   // 0 ET 1 = 0
+        et3: false,   // 1 ET 0 = 0
+        et4: true,    // 1 ET 1 = 1
+        ou1: false,   // 0 OU 0 = 0
+        ou2: true,    // 0 OU 1 = 1
+        ou3: true,    // 1 OU 0 = 1
+        ou4: true     // 1 OU 1 = 1
     };
 
     for(let id in correct){
@@ -198,28 +233,76 @@ function corriger() {
     let percent = Math.round((score/total)*100);
 
     let level = "";
+    let message = "";
 
-    if(percent < 50) level = "🔴 Insuffisant";
-    else if(percent < 75) level = "🟡 Moyen";
-    else if(percent < 90) level = "🟢 Bon";
-    else level = "🏆 Excellent";
+    if(percent < 50) {
+        level = "🔴 Insuffisant";
+        message = "Revoyez les règles de l'ET et du OU !";
+    }
+    else if(percent < 75) {
+        level = "🟡 Moyen";
+        message = "Encore quelques erreurs, vous pouvez mieux faire !";
+    }
+    else if(percent < 90) {
+        level = "🟢 Bon";
+        message = "Presque parfait ! Continuez comme ça !";
+    }
+    else {
+        level = "🏆 Excellent";
+        message = "Parfait ! Vous maîtrisez la table de vérité !";
+    }
 
-    document.getElementById("result").innerHTML =
-        `Score : ${percent}% (${score}/8) <br>${level}`;
+    document.getElementById("result").innerHTML = 
+        `📊 Score : ${percent}% (${score}/${total})<br>🎯 ${level}<br>💡 ${message}`;
 }
 
+// RÉCUPÉRATION DE L'URL POUR LE QR CODE
+function getGitHubUrl() {
+    let currentUrl = window.location.href;
+    
+    // Si c'est une URL locale, suggère l'URL GitHub
+    if(currentUrl.includes("localhost") || 
+       currentUrl.includes("127.0.0.1") || 
+       currentUrl.includes("file://")) {
+        
+        // À MODIFIER : Remplace par TON pseudo GitHub
+        let githubUsername = "TON_PSEUDO_GITHUB";  // ← CHANGE ICI
+        let repoName = "simulateur-tdv";
+        
+        return `https://${githubUsername}.github.io/${repoName}/`;
+    }
+    
+    return currentUrl;
+}
 
-// QR CODE DYNAMIQUE (IMPORTANT POUR GITHUB PAGES)
-let currentURL = window.location.href;
+// AFFICHAGE DU QR CODE
+let finalUrl = getGitHubUrl();
 
+// Affiche l'URL sous le QR
+document.getElementById("linkDisplay").innerHTML = `🌐 ${finalUrl}`;
+
+// Génère le QR code
 new QRCode(document.getElementById("qrcode"), {
-    text: currentURL,
-    width: 160,
-    height: 160,
+    text: finalUrl,
+    width: 180,
+    height: 180,
     colorDark: "#38bdf8",
-    colorLight: "#ffffff"
+    colorLight: "#ffffff",
+    correctLevel: QRCode.CorrectLevel.M
 });
 
+// AJOUT d'un message d'aide si l'URL n'est pas modifiée
+if(finalUrl.includes("TON_PSEUDO_GITHUB")) {
+    document.getElementById("linkDisplay").innerHTML += 
+        "<br>⚠️ Remplace 'TON_PSEUDO_GITHUB' par ton pseudo GitHub dans le code !";
+}
+
+// Réinitialisation facile (optionnelle)
+function reinitialiser() {
+    let allBoxes = document.querySelectorAll('input[type="checkbox"]');
+    allBoxes.forEach(box => box.checked = false);
+    document.getElementById("result").innerHTML = "";
+}
 </script>
 
 </body>
